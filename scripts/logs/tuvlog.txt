@@ -1,0 +1,1 @@
+inpfil =        CDMX   outfil =        cdmx   nstr =            -2

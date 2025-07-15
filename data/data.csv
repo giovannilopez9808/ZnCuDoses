@@ -1,0 +1,13 @@
+Nombre,Ciudad,Latitud,Longitud,Altitud (msnm),Hora local (GMT±),Albedo superficial (estimado),AOD550nm,REF_AOD
+NY,Nueva York,40.7296,–73.9352 ,10,-4,0.2,0.17,"https://acp.copernicus.org/articles/22/15703/2022/acp-22-15703-2022.pdf, https://www.sciencedirect.com/science/article/pii/S0038092X22008672#f0015"
+LA,Los Ángeles,34.0522,–118.2437 ,90,-7,0.2,0.15,https://www.sciencedirect.com/science/article/pii/S0038092X22008672#f0015
+MTY,Monterrey,25.6866,–100.3161 ,540,-6,0.2,0.3,
+CDMX,Ciudad de México,19.4326,–99.1332 ,2240,-6,0.18,0.2,https://www.sciencedirect.com/science/article/pii/S0038092X22008672#f0015
+CAR,Cartagena,10.391,–75.4794 ,2,-5,0.2,0.12,
+MED,Medellín,6.2442,–75.5812 ,1500,-5,0.2,0.16,https://www.nature.com/articles/s41598-024-51247-9
+ROS,Rosario,–32.9468 ,–60.6393 ,25,-3,0.2,0.12,
+SAN,Santiago de Chile,–33.4489 ,–70.6693 ,570,-4,0.18,0.2,
+LON,Londres,51.5074,–0.1278 ,11,0,0.2,0.15,
+ZUR,Zúrich,47.3769,8.5417,408,2,0.2,0.15,
+MUM,Mumbai,19.076,72.8777,14,5.5,0.18,0.7,
+SHA,Shanghái,31.2304,121.4737,4,8,0.18,0.5,
