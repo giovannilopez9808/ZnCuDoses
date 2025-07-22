@@ -76,9 +76,9 @@ class TUV:
         results = self._read_TUV_output(
             "result.txt",
         )
-        terminal(
-            "rm ../results/*.txt"
-        )
+        # terminal(
+        # "rm ../results/*.txt"
+        # )
         return results
 
     @staticmethod
@@ -92,16 +92,18 @@ class TUV:
         )
         data = loadtxt(
             filename,
-            skiprows=12,
-            max_rows=60,
+            usecols=range(
+                2,
+                62
+            ),
+            skiprows=3,
+            max_rows=3,
         )
         data = DataFrame(
             data,
         )
-        data = data[[
-            0,
-            2,
-        ]]
+        data = data.T
+        data = data[[0, 2]]
         data.columns = [
             "Hours",
             "Radiation",
@@ -296,14 +298,16 @@ class TUVSearchAOD:
         )
         data = loadtxt(
             filename,
-            skiprows=134,
-            max_rows=59,
+            usecols=range(
+                2,
+                62
+            ),
+            skiprows=3,
+            max_rows=3,
         )
-        data = data[
-            minute+1
-        ]
-        data = data[3:5]
-        data = sum(
+        data = DataFrame(
             data,
         )
+        data = data.T
+        data = data[[0, 2]]
         return data

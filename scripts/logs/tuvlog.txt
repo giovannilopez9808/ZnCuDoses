@@ -1,1 +1,29 @@
 inpfil =        CDMX   outfil =        cdmx   nstr =            -2
+lat =         31.230   lon =        121.473   tmzone =         8.0
+iyear =         2016   imonth =           1   iday =             9
+zstart =       0.004   zstop =       80.000   nz =              81
+wstart =     280.000   wstop =      400.000   nwint =          120
+tstart =      10.000   tstop =       15.000   nt =              61
+lzenit =           F   alsurf =       0.180   psurf =       -999.0
+o3col =      228.380   so2col =       0.000   no2col =       0.100
+taucld =       0.000   zbase =        4.000   ztop =         5.000
+tauaer =       0.500   ssaaer =       0.800   alpha =        1.000
+dirsun =       1.000   difdn =        1.000   difup =        0.000
+zout =         2.245   zaird =   -9.990E+02   ztemp =     -999.000
+lirrad =           T   laflux =           F   lmmech =           F
+lrates =           T   isfix =            0   nms =              1
+ljvals =           F   ijfix =            0   nmj =              0
+iwfix =            0   itfix =            0   izfix =            0
+==================================================================
+==== Spectral weighting functions used:
+T  1 vis+, > 400 nm                                    
+==== Photolysis reactions used:
+==================================================================
+ air temperature: USSA, 1976
+ air concentrations: USSA, 1976
+ ozone profile: USSA, 1976
+ DATAE1/SUN/susim_hi.flx
+ DATAE1/SUN/atlas3_1994_317_a.dat        
+ DATAE1/SUN/neckel.flx                   
+ DATAE1/SUN/sao2010.solref.converted     
+ aerosols:  Elterman (1968) continental profile

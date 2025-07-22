@@ -1,6 +1,5 @@
 from scipy.integrate import trapezoid
 from itertools import product
-from matplotlib import pyplot
 from modules.TUV import TUV
 from os.path import join
 from pandas import (
@@ -25,29 +24,24 @@ def find_TES(
             _data["Hours"]
         )
         if tuv_dose >= doses:
-            found = True
+            return tes, tuv_dose
         else:
             tes += 1
         if tes == total:
-            return None
-    return tes
+            return None, tuv_dose
 
 
 params = dict(
-    dates=list([
-        to_datetime(
-            "2024-06-21",
-        ),
-        to_datetime(
-            "2024-12-21",
-        ),
-    ]),
+    dates=range(
+        1,
+        13,
+    ),
     data=dict(
-        # zn=dict(
-        # wavelength=631.5,
-        # factor=0.32711,
-        # doses=4264,
-        # ),
+        zn=dict(
+            wavelength=631.5,
+            factor=0.32711,
+            doses=4264,
+        ),
         cu=dict(
             wavelength=745.5,
             factor=0.4645,
@@ -65,8 +59,8 @@ dataset = read_csv(
     index_col="Nombre",
 )
 data = product(
-    params["dates"],
     params["data"],
+    params["dates"],
 )
 data = list(data)
 model = TUV()
@@ -76,18 +70,23 @@ results = DataFrame(
         "Date",
         "Particule",
         "TES",
+        "TUV Dose",
+        "Dose ratio",
     ]
 )
 for name in dataset.index:
     city = dataset.loc[name]
-    for date, particule_name in data:
+    for particule_name, month in data:
+        date = to_datetime(
+            f"2024-{month}-21"
+        )
         particule = params["data"][particule_name]
         radiation = DataFrame()
         for hour in range(12, 20):
             inputs = dict(
                 wavelength=particule["wavelength"],
                 aod=city["AOD550nm"],
-                ozone=200,
+                ozone=250,
                 # ozone=city["Ozone"],
                 month=date.month,
                 year=date.year,
@@ -103,16 +102,23 @@ for name in dataset.index:
                 radiation,
                 _radiation,
             ])
-        radiation["Radiation"] = radiation["Radiation"]*particule["factor"]
+        radiation["Radiation"] = radiation["Radiation"] * particule["factor"]
         radiation["Hours"] = radiation["Hours"]*3600
-        tes = find_TES(
+        tes, tuv_dose = find_TES(
             radiation,
             particule["doses"],
         )
+        ratio = tuv_dose/particule["doses"]
         results.loc[len(results)] = [
             city["Ciudad"],
             date.strftime("%Y-%m-%d"),
             particule_name,
             tes,
+            tuv_dose,
+            ratio,
         ]
         print(results)
+results.to_csv(
+    "ZnCuDoses.csv",
+    index=False,
+)
