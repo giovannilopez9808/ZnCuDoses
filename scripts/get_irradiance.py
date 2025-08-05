@@ -1,7 +1,7 @@
 from itertools import product
 from modules.TUV import TUV
 from os.path import join
-from os import makedirs
+from tqdm import tqdm
 from pandas import (
     to_datetime,
     Timestamp,
@@ -45,14 +45,14 @@ params = dict(
     ),
     data=dict(
         zn=dict(
-            wavelength=631.5,
-            factor=0.32711,
-            doses=4264,
+            wavelength_i=419.5,
+            wavelength_f=632.5,
+            doses=1353600,
         ),
         cu=dict(
-            wavelength=745.5,
-            factor=0.4645,
-            doses=13,
+            wavelength_i=419.5,
+            wavelength_f=746.5,
+            doses=331200,
         ),
     )
 )
@@ -81,30 +81,38 @@ results = DataFrame(
         "Dose ratio",
     ]
 )
-for name in dataset.index:
+for name in tqdm(
+    dataset.index,
+    leave=False,
+):
     city = dataset.loc[name]
     city_dataset = {
         particule_name: DataFrame()
         for particule_name in params["data"]
     }
-    for month, particule_name in data:
+    for month, particule_name in tqdm(
+        data,
+        leave=False,
+    ):
         date = to_datetime(
             f"2024-{month}-21"
         )
         particule = params["data"][particule_name]
         radiation = DataFrame()
-        for hour in range(12, 20):
+        for hour in range(5, 21):
             inputs = dict(
-                wavelength=particule["wavelength"],
+                wavelength_i=particule["wavelength_i"],
+                wavelength_f=particule["wavelength_f"],
+                particule=particule_name,
                 aod=city["AOD550nm"],
-                ozone=250,
                 # ozone=city["Ozone"],
                 month=date.month,
+                output="results",
                 year=date.year,
                 day=date.day,
                 hour=hour,
+                ozone=250,
                 name=name,
-                output="results",
             )
             _radiation = model.run(
                 **inputs,
@@ -113,7 +121,6 @@ for name in dataset.index:
                 radiation,
                 _radiation,
             ])
-        radiation["Radiation"] = radiation["Radiation"] * particule["factor"]
         radiation = radiation.rename(
             columns={
                 "Radiation": particule_name

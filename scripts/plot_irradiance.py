@@ -64,16 +64,22 @@ for name in dataset.index:
         )
         for tick in ticks
     )
+    ticks = list(
+        tick.strftime(
+            "%Y-%d"
+        )
+        for tick in ticks
+    )
     pyplot.subplots(
         figsize=(
-            16,
+            20,
             5,
         )
     )
-    pyplot.ylim(
-        0,
-        0.6,
-    )
+    # pyplot.ylim(
+    # 0,
+    # 0.6,
+    # )
     pyplot.plot(
         radiation["zn"],
         label="Zn",

@@ -1,11 +1,11 @@
 from scipy.integrate import trapezoid
 from os import system as terminal
-from numpy import loadtxt
+from numpy import array, loadtxt
 from os.path import join
 from tqdm import tqdm
 from pandas import (
     DataFrame,
-    concat,
+    read_csv,
 )
 
 
@@ -25,7 +25,8 @@ class TUV:
         month: int,
         day: int,
         hour: int,
-        wavelenght: int,
+        wavelenght_i: int,
+        wavelenght_f: int,
     ) -> None:
         file = open(
             "./input_tuv.txt",
@@ -40,7 +41,8 @@ class TUV:
             str(hour),
             str(aod),
             str(ozone),
-            str(wavelenght),
+            str(wavelenght_i),
+            str(wavelenght_f),
         ])
         file.write(
             text,
@@ -55,9 +57,11 @@ class TUV:
         month: int,
         day: int,
         hour: int,
-        wavelength: int,
+        wavelength_i: int,
+        wavelength_f: int,
         name: str,
         output: str,
+        particule: str,
     ) -> DataFrame:
         self._create_input_TUV_file(
             name,
@@ -68,23 +72,40 @@ class TUV:
             month,
             day,
             hour,
-            wavelength,
+            wavelength_i,
+            wavelength_f,
         )
         terminal(
             "./tuv"
         )
         results = self._read_TUV_output(
             "result.txt",
+            wavelength_i,
+            wavelength_f,
+            particule,
+            hour,
         )
         # terminal(
         # "rm ../results/*.txt"
         # )
         return results
 
-    @staticmethod
     def _read_TUV_output(
+        self,
         filename: str,
+        wavelength_i: int,
+        wavelength_f: int,
+        particule: str,
+        hour: int,
     ) -> float:
+        rows = int(
+            wavelength_f-wavelength_i
+        )
+        factors = self._read_factors(
+            particule,
+            wavelength_i,
+            wavelength_f,
+        )
         filename = join(
             "..",
             "results",
@@ -93,22 +114,86 @@ class TUV:
         data = loadtxt(
             filename,
             usecols=range(
-                2,
-                62
+                1,
+                61,
             ),
-            skiprows=3,
-            max_rows=3,
+            skiprows=5,
+            max_rows=rows,
+            dtype=str,
+        )
+        data = data.T
+        data = DataFrame(
+            data,
+        )
+        data = data.astype(
+            float,
+        )
+        data = data.multiply(
+            factors,
+            axis=1,
+        )
+        data = data.apply(
+            lambda values:
+            trapezoid(
+                values,
+            ),
+            axis=1,
         )
         data = DataFrame(
             data,
         )
-        data = data.T
-        data = data[[0, 2]]
         data.columns = [
-            "Hours",
             "Radiation",
         ]
+        data.index.name = "Hours"
+
+        data = data.reset_index()
+        data["Hours"] = data["Hours"].apply(
+            lambda minute:
+            self._get_decimal_hour(
+                hour,
+                minute,
+            )
+        )
         return data
+
+    @staticmethod
+    def _get_decimal_hour(
+        hour: int,
+        minute: int,
+    ) -> float:
+        hour = hour+minute/60
+        return hour
+
+    @staticmethod
+    def _read_factors(
+        particule: str,
+        wavelength_i: float,
+        wavelength_f: float,
+    ) -> array:
+        filename = join(
+            "..",
+            "data",
+            "absortion_factor_Cu_Zn.csv",
+        )
+        factors = read_csv(
+            filename,
+            index_col=0,
+        )
+        factors = factors[
+            (
+                factors.index >= wavelength_i+0.5
+            ) &
+            (
+                factors.index <= wavelength_f-0.5
+            )
+        ]
+        factors = factors[[
+            particule
+        ]]
+        factors = factors.to_numpy()
+        factors = factors.flatten()
+        return factors
 
 
 class TUVSearchAOD:

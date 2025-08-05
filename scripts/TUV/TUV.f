@@ -218,7 +218,7 @@
 
 ! Agregado por Giovanni Gamaliel Lopez Padilla
       integer hour,ihour,fhour,endoffile
-      real aodcustom,ozonecustom,wavecustom
+      real aodcustom,ozonecustom,wavecustom_i,wavecustom_f
       CHARACTER*6 fileout
 
 
@@ -242,7 +242,7 @@ c      OPEN(UNIT=kout,FILE='tuvlog',STATUS='UNKNOWN')
       do
       read(13,*,iostat = endoffile) inpfil,fileout,
      $            iyear,imonth,iday,ihour,aodcustom,ozonecustom,
-     $            wavecustom
+     $            wavecustom_i,wavecustom_f
       close(13)
       if (endoffile .LT. 0) call exit(123)
       CALL rdinp(intrct, 
@@ -260,16 +260,16 @@ c      OPEN(UNIT=kout,FILE='tuvlog',STATUS='UNKNOWN')
       tstart = ihour
       tauaer = aodcustom
       o3_tc = ozonecustom
-      wstart = wavecustom
-      wstop = wavecustom+1
-      nwint = 1
+      wstart = wavecustom_i
+      wstop = wavecustom_f
+      nwint = wstop-wstart
       tstop = ihour+1
       open(13,file="./input_tuv.txt")
 ! Handle for EOF
 
       read(13,*,iostat = endoffile) inpfil,fileout,
      $            iyear,imonth,iday,ihour,aodcustom,ozonecustom,
-     $            wavecustom
+     $            wavecustom_i,wavecustom_f
 
 * ___ SECTION 2: SET GRIDS _________________________________________________
 
