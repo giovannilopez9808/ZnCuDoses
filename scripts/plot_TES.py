@@ -55,6 +55,7 @@ def plot_TES(
         data["TES"]/60,
         label=label,
         color=color,
+        lw=5,
     )
 
 
@@ -102,57 +103,75 @@ for name in dataset.index:
         for tick in ticks
     )
     ticks = list(
+        tick.replace(
+            month=tick.day,
+            day=1,
+        )
+        for tick in ticks
+    )
+    ticks = list(
         tick.strftime(
-            "%Y-%d"
+            "%b"
         )
         for tick in ticks
     )
     fig, ax1 = pyplot.subplots(
         figsize=(
-            20,
+            8,
             5,
         ),
         # ncols=2,
     )
+    ax2 = ax1.twinx()
     plot_TES(
         data=zn_data,
         ax=ax1,
         hour=11,
         label="Zn noon",
-        color="red",
+        color="black",
     )
     plot_TES(
         data=zn_data,
         ax=ax1,
         hour=8,
         label="Zn sunrise",
-        color="green",
+        color="grey",
     )
     plot_TES(
         data=cu_data,
         ax=ax1,
         hour=11,
         label="Cu noon",
-        color="blue",
+        color="red",
     )
     plot_TES(
         data=cu_data,
         ax=ax1,
         hour=8,
         label="Cu sunrise",
-        color="purple",
+        color="brown",
     )
-    ax2 = ax1
-    # ax2 = ax1.twinx()
-    # ax1.set_ylabel(
-    # "Irradiancia máxima diaria (W/m$^2$)",
-    # fontsize=16,
-    # )
-    ax2.set_ylabel(
-        "TES (hour)",
-        # rotation=-90,
+    ax1.set_ylabel(
+        "HT CuFe$_2$O$_4$ (hours)",
         fontsize=16,
-        # labelpad=25,
+    )
+    ax2.set_ylabel(
+        "HT ZnFe$_2$O$_4$ (hours)",
+        rotation=-90,
+        fontsize=16,
+        labelpad=25,
+    )
+    ax1.set_xlim(
+        dates[0],
+        dates[-1],
+    )
+    ax1.set_ylim(
+        0,
+        12,
+    )
+    ax2.set_ylim(
+        0,
+        6,
     )
     ax1.set_xticks(
         dates,
@@ -162,18 +181,11 @@ for name in dataset.index:
     )
     ax1.tick_params(
         labelsize=16,
+        pad=8,
     )
     ax2.tick_params(
         labelsize=16,
-    )
-    fig.legend(
-        bbox_to_anchor=(
-            0.75,
-            1.02,
-        ),
-        frameon=False,
-        fontsize=16,
-        ncols=4,
+        pad=8,
     )
     folder = join(
         "..",
