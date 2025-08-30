@@ -2,9 +2,10 @@ from matplotlib.gridspec import GridSpec
 from matplotlib.pyplot import figure
 from matplotlib.image import imread
 from matplotlib.lines import Line2D
-from matplotlib import patheffects
 from matplotlib.axes import Axes
+from pandas import read_csv
 from os.path import join
+from sys import argv
 
 
 def plot_image(
@@ -24,6 +25,26 @@ def plot_image(
     )
 
 
+def plot_location(
+    ax: Axes,
+    longitude: float,
+    latitude: float,
+) -> None:
+    longitude = longitude+180
+    longitude = longitude/360
+    longitude = longitude*720
+    latitude = latitude*-1
+    latitude = latitude+90
+    latitude = latitude/180
+    latitude = latitude*360
+    ax.scatter(
+        longitude,
+        latitude,
+        color="black",
+        s=500,
+    )
+
+
 def plot_text(
     ax: Axes,
     text: str,
@@ -35,17 +56,18 @@ def plot_text(
         y,
         text,
         horizontalalignment='center',
+        weight="bold",
         fontdict={
-            "size": 30,
+            "size": 40,
         },
     )
-    text.set_path_effects(
-        [
-            patheffects.withStroke(
-                linewidth=5,
-                foreground='w',)
-        ]
-    )
+    # text.set_path_effects(
+    # [
+    # patheffects.withStroke(
+    # linewidth=5,
+    # foreground='w',)
+    # ]
+    # )
 
 
 fig = figure(
@@ -60,10 +82,21 @@ grid = GridSpec(
     wspace=0,
     hspace=0,
 )
-
-
-legend = fig.add_subplot(
-    grid[0, 0],
+filename = join(
+    "..",
+    "data",
+    "data.csv"
+)
+dataset = read_csv(
+    filename,
+    index_col=0,
+)
+dataset = dataset[[
+    "Latitud",
+    "Longitud",
+]]
+dataset = dataset.astype(
+    float,
 )
 up_1 = fig.add_subplot(
     grid[0, 1],
@@ -128,22 +161,28 @@ axs = dict(
     SHA=right_2,
 )
 for city, ax in axs.items():
+    city_dataset = dataset.loc[city]
     filename = f"{city}.png"
     filename = join(
         "..",
         "graphics",
-        "TUV",
+        f"TES_{argv[1]}",
         filename,
     )
     plot_image(
         filename,
         ax,
     )
+    plot_location(
+        world,
+        city_dataset["Longitud"],
+        city_dataset["Latitud"],
+    )
 plot_text(
     world,
     "Los Angeles",
     100+20,
-    110,
+    105,
 )
 plot_text(
     world,
@@ -155,25 +194,25 @@ plot_text(
     world,
     "London",
     350+20,
-    80,
+    70,
 )
 plot_text(
     world,
     "Zurich",
-    370+20,
+    380+20,
     85,
 )
 plot_text(
     world,
-    "Shangai",
+    "Shanghai",
     570+20,
-    125,
+    130,
 )
 plot_text(
     world,
     "Mumbai",
     490+20,
-    140,
+    135,
 )
 plot_text(
     world,
@@ -183,53 +222,61 @@ plot_text(
 )
 plot_text(
     world,
-    "Ciudad\nde México",
+    "Mexico City",
     140+20,
-    140,
+    155,
 )
 plot_text(
     world,
     "Cartagena",
-    340+20,
-    105,
+    205+20,
+    150,
 )
 plot_text(
     world,
     "Medellin",
     200+20,
-    175,
+    180,
 )
 plot_text(
     world,
     "Rosario",
     220+20,
-    245,
+    240,
 )
 plot_text(
     world,
-    "Santiago\nde\nChile",
-    200+20,
-    245,
+    "Santiago",
+    190+20,
+    265,
 )
-colors = {
-    "1": dict(
-        name="HT ZnFe$_2$O$_4$ mediodia",
-        color="black",
-    ),
-    "2": dict(
-        name="HT ZnFe$_2$O$_4$ amanecer",
-        color="grey",
-    ),
-    "3": dict(
-        name="HT CuFe$_2$O$_4$ mediodia",
-        color="red",
-    ),
-    "4": dict(
-        name="HT CuFe$_2$O$_4$ amanecer",
-        color="brown",
-    ),
-}
-
+colors = dict()
+if argv[1] != "Cu":
+    colors.update(
+        {
+            "1": dict(
+                name="HT-ZnFe$_2$O$_4$ noon",
+                color="red",
+            ),
+            "2": dict(
+                name="HT-ZnFe$_2$O$_4$ sunrise",
+                color="orange",
+            )
+        }
+    )
+if argv[1] != "Fe":
+    colors.update(
+        {
+            "3": dict(
+                name="HT-CuFe$_2$O$_4$ noon",
+                color="blue",
+            ),
+            "4": dict(
+                name="HT-CuFe$_2$O$_4$ sunrise",
+                color="#00b4d8",
+            ),
+        }
+    )
 custom_lines = list(
     Line2D(
         [0],
@@ -243,20 +290,28 @@ labels = list(
     data["name"]
     for data in colors.values()
 )
-legend.axis(
-    "off"
-)
-legend.legend(
+world.legend(
     custom_lines,
     labels,
-    loc="center",
+    frameon=False,
+    loc="lower center",
+    bbox_to_anchor=(
+        0.5,
+        -0.1,
+    ),
     fontsize=60,
+    ncols=4,
 )
 fig.tight_layout(
     h_pad=0,
     w_pad=0,
     pad=0,
 )
+folder = join(
+    "..",
+    "graphics",
+    f"TES_{argv[1]}.pdf"
+)
 fig.savefig(
-    "test.pdf"
+    folder,
 )

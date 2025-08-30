@@ -79,6 +79,9 @@ for ax, name in zip(
     radiation = radiation.resample(
         "1min"
     ).mean()
+    radiation = radiation.resample(
+        "1d"
+    ).max()
     radiation = radiation/constant
     ticks = get_dates(
         radiation,
@@ -176,7 +179,7 @@ folder = join(
     "..",
     "graphics",
 )
-filename = "Daily_radiation_einstein.png"
+filename = "Radiation_einstein.png"
 filename = join(
     folder,
     filename,
